@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India's Privacy Trust Gap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div id="app"></div>
+
+    <script>
+        let currentView = 'hero';
+
+        const data = {
+            clauseData: [
+                { name: 'C1: National Security', acceptance: 58, color: '#10b981', desc: 'Government can process data for national security without consent' },
+                { name: 'C2: Legitimate Purposes', acceptance: 42, color: '#f59e0b', desc: 'Consent may not be required for "legitimate purposes"' },
+                { name: 'C3: Research Exemptions', acceptance: 52, color: '#3b82f6', desc: 'Government can exempt research activities' },
+                { name: 'C4: Startup Exemptions', acceptance: 45, color: '#f59e0b', desc: 'Startups may be exempt from consent notices' },
+                { name: 'C5: No Compensation', acceptance: 38, color: '#ef4444', desc: 'No compensation for citizens after breaches' },
+                { name: 'C6: Board Tenure', acceptance: 54, color: '#10b981', desc: 'Board members serve 2-year terms' },
+                { name: 'C7: Board Appointment', acceptance: 51, color: '#3b82f6', desc: 'Central Government appoints Board members' },
+                { name: 'C8: Voluntary Sharing', acceptance: 55, color: '#10b981', desc: 'DPDPA does not apply to voluntarily shared data' },
+                { name: 'C9: No Lawsuits', acceptance: 35, color: '#ef4444', desc: 'No lawsuits against Government for good faith actions' },
+                { name: 'C10: Data Transfer', acceptance: 41, color: '#ef4444', desc: 'Data can be transferred abroad unless restricted' }
+            ],
+            paradoxClaims: [
+                { label: 'Never Share Data', count: 190, color: '#10b981' },
+                { label: 'When Required', count: 223, color: '#f59e0b' },
+                { label: 'Share Readily', count: 15, color: '#ef4444' }
+            ],
+            paradoxActions: [
+                { label: 'Always Accept Cookies', count: 80, color: '#ef4444' },
+                { label: 'Sometimes Accept', count: 183, color: '#f59e0b' },
+                { label: 'Mostly Reject', count: 165, color: '#10b981' }
+            ]
+        };
+
+        function navigate(view) {
+            currentView = view;
+            render();
+        }
+
+        function renderHero() {
+            return `
+                <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900 text-white p-8">
+                    <div class="text-center max-w-4xl">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-6">India's Privacy Trust Gap</h1>
+                        <p class="text-xl md:text-2xl mb-12 text-gray-200">Exploring the deficit in trust with people on the use of their personal data</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                            <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                                <div class="text-5xl font-bold text-yellow-400 mb-2">16%</div>
+                                <div class="text-sm">Understand DPDPA</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                                <div class="text-5xl font-bold text-red-400 mb-2">82%</div>
+                                <div class="text-sm">Value Privacy</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                                <div class="text-5xl font-bold text-orange-400 mb-2">50%</div>
+                                <div class="text-sm">Struggle to Reject</div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onclick="navigate('paradox')"
+                            class="bg-gradient-to-r from-orange-500 to-red-600 px-8 py-4 rounded-full text-lg font-semibold hover:scale-105 transition-transform cursor-pointer"
+                        >
+                            Explore the Data
+                        </button>
+
+                        <div class="mt-16 pt-8 border-t border-white/20 text-sm text-gray-400">
+                            <p class="font-semibold mb-2">Data Sources:</p>
+                            <p>Max Planck Institute & IIT Bombay (428 users, 2024)</p>
+                            <p>PwC India Survey (3,000+ respondents, 2024)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderParadox() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">The Privacy Paradox</h2>
+                        <p class="text-xl text-center text-gray-300 mb-12">What Indians claim vs. what they actually do</p>
+
+                        <div class="grid md:grid-cols-2 gap-12 mb-12">
+                            <div class="bg-gradient-to-br from-green-900/30 p-8 rounded-2xl border border-green-500/30">
+                                <h3 class="text-3xl font-bold mb-8 text-green-400">Claims About Sharing</h3>
+                                ${data.paradoxClaims.map(item => `
+                                    <div class="mb-6">
+                                        <div class="flex justify-between mb-2">
+                                            <span class="font-semibold">${item.label}</span>
+                                            <span class="text-2xl font-bold" style="color: ${item.color}">${item.count}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-4">
+                                            <div class="h-4 rounded-full" style="width: ${(item.count/428)*100}%; background-color: ${item.color}"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="bg-gradient-to-br from-red-900/30 p-8 rounded-2xl border border-red-500/30">
+                                <h3 class="text-3xl font-bold mb-8 text-red-400">Actual Cookie Behavior</h3>
+                                ${data.paradoxActions.map(item => `
+                                    <div class="mb-6">
+                                        <div class="flex justify-between mb-2">
+                                            <span class="font-semibold">${item.label}</span>
+                                            <span class="text-2xl font-bold" style="color: ${item.color}">${item.count}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-4">
+                                            <div class="h-4 rounded-full" style="width: ${(item.count/428)*100}%; background-color: ${item.color}"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-900/20 p-8 rounded-2xl border border-yellow-500/30 text-center mb-12">
+                            <p class="text-xl text-yellow-400 font-semibold">⚠️ 30 people who claimed to "never share" still "always accept cookies"</p>
+                        </div>
+
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigate('hero')" class="bg-gray-700 px-6 py-3 rounded-lg hover:bg-gray-600 cursor-pointer">← Back</button>
+                            <button onclick="navigate('dpdpa')" class="bg-gradient-to-r from-purple-500 to-blue-600 px-8 py-3 rounded-lg font-semibold cursor-pointer">DPDPA Clauses →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDPDPA() {
+            setTimeout(() => {
+                const ctx = document.getElementById('clauseChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.clauseData.map(d => d.name),
+                            datasets: [{
+                                label: 'Acceptance %',
+                                data: data.clauseData.map(d => d.acceptance),
+                                backgroundColor: data.clauseData.map(d => d.color),
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#1f2937',
+                                    titleColor: '#fff',
+                                    bodyColor: '#fff'
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { color: '#fff' },
+                                    grid: { color: 'rgba(255,255,255,0.1)' }
+                                },
+                                y: {
+                                    ticks: { color: '#fff', font: { size: 11 } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-orange-900 to-red-900 text-white p-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">DPDPA Clause Acceptance</h2>
+                        <p class="text-xl text-center text-gray-300 mb-12">How Indians view controversial privacy law provisions</p>
+
+                        <div class="bg-white/5 p-8 rounded-2xl mb-12">
+                            <div style="height: 500px">
+                                <canvas id="clauseChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-8 mb-12">
+                            <div class="bg-green-900/20 p-6 rounded-lg border border-green-500/30">
+                                <p class="font-semibold text-green-400 mb-4 text-xl">Most Accepted</p>
+                                <p class="mb-2">✓ C1: National Security (58%)</p>
+                                <p class="mb-2">✓ C8: Voluntary Sharing (55%)</p>
+                                <p>✓ C6: Board Tenure (54%)</p>
+                            </div>
+                            <div class="bg-red-900/20 p-6 rounded-lg border border-red-500/30">
+                                <p class="font-semibold text-red-400 mb-4 text-xl">Least Accepted</p>
+                                <p class="mb-2">✗ C9: No Lawsuits (35%)</p>
+                                <p class="mb-2">✗ C5: No Compensation (38%)</p>
+                                <p>✗ C10: Data Transfer (41%)</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigate('paradox')" class="bg-gray-700 px-6 py-3 rounded-lg hover:bg-gray-600 cursor-pointer">← Back</button>
+                            <button onclick="navigate('banners')" class="bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 rounded-lg font-semibold cursor-pointer">Cookie Banners →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBanners() {
+            setTimeout(() => {
+                const ctx = document.getElementById('bannerChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Confirmation Only', 'Binary Choice', 'No Option'],
+                            datasets: [
+                                { label: 'Accept', data: [46, 11, 0], backgroundColor: '#ef4444' },
+                                { label: 'Reject', data: [0, 45, 0], backgroundColor: '#10b981' },
+                                { label: 'Close', data: [34, 34, 22], backgroundColor: '#f59e0b' },
+                                { label: 'Exit', data: [20, 10, 78], backgroundColor: '#6b7280' }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#fff' } },
+                                tooltip: { backgroundColor: '#1f2937' }
+                            },
+                            scales: {
+                                x: { stacked: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                                y: { stacked: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 text-white p-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">Cookie Banner Journey</h2>
+                        <p class="text-xl text-center text-gray-300 mb-12">How banner design shapes user behavior</p>
+
+                        <div class="bg-white/5 p-8 rounded-2xl mb-12">
+                            <div style="height: 400px">
+                                <canvas id="bannerChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6 mb-12">
+                            <div class="bg-white/10 p-6 rounded-xl text-center">
+                                <div class="text-4xl font-bold text-red-400 mb-2">46%</div>
+                                <div class="text-sm">Accept when no reject option</div>
+                            </div>
+                            <div class="bg-white/10 p-6 rounded-xl text-center">
+                                <div class="text-4xl font-bold text-green-400 mb-2">45%</div>
+                                <div class="text-sm">Reject when given clear choice</div>
+                            </div>
+                            <div class="bg-white/10 p-6 rounded-xl text-center">
+                                <div class="text-4xl font-bold text-orange-400 mb-2">78%</div>
+                                <div class="text-sm">Exit when no options provided</div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigate('dpdpa')" class="bg-gray-700 px-6 py-3 rounded-lg hover:bg-gray-600 cursor-pointer">← Back</button>
+                            <button onclick="navigate('themes')" class="bg-gradient-to-r from-green-500 to-teal-600 px-8 py-3 rounded-lg font-semibold cursor-pointer">Themes →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderThemes() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-teal-900 to-green-900 text-white p-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">Three Interconnected Themes</h2>
+                        <p class="text-xl text-center text-gray-300 mb-12">From 143 open-ended responses</p>
+
+                        <div class="flex items-center justify-center gap-8 md:gap-12 mb-12 flex-wrap">
+                            <div class="flex flex-col items-center">
+                                <div class="w-40 h-40 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex flex-col items-center justify-center shadow-2xl">
+                                    <div class="text-4xl md:text-5xl mb-2">🔒</div>
+                                    <div class="text-xl md:text-2xl font-bold">Theme 1</div>
+                                    <div class="text-xs md:text-sm text-center px-4">Privacy Concerns</div>
+                                </div>
+                            </div>
+
+                            <div class="text-4xl md:text-6xl text-yellow-400">↔</div>
+
+                            <div class="flex flex-col items-center">
+                                <div class="w-40 h-40 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 flex flex-col items-center justify-center shadow-2xl">
+                                    <div class="text-4xl md:text-5xl mb-2">⚖️</div>
+                                    <div class="text-xl md:text-2xl font-bold">Theme 2</div>
+                                    <div class="text-xs md:text-sm text-center px-4">DPDPA Reform</div>
+                                </div>
+                            </div>
+
+                            <div class="text-4xl md:text-6xl text-blue-400">↔</div>
+
+                            <div class="flex flex-col items-center">
+                                <div class="w-40 h-40 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col items-center justify-center shadow-2xl">
+                                    <div class="text-4xl md:text-5xl mb-2">🏛️</div>
+                                    <div class="text-xl md:text-2xl font-bold">Theme 3</div>
+                                    <div class="text-xs md:text-sm text-center px-4">System Distrust</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/5 p-8 rounded-2xl mb-12">
+                            <p class="text-lg md:text-xl text-center text-gray-300 leading-relaxed">
+                                <span class="text-red-400 font-semibold">Privacy concerns</span> drive demands for 
+                                <span class="text-yellow-400 font-semibold"> better regulation</span>, but both are shaped by deep 
+                                <span class="text-blue-400 font-semibold"> skepticism about government</span> motives and capabilities
+                            </p>
+                        </div>
+
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigate('banners')" class="bg-gray-700 px-6 py-3 rounded-lg hover:bg-gray-600 cursor-pointer">← Back</button>
+                            <button onclick="navigate('global')" class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-3 rounded-lg font-semibold cursor-pointer">Global Context →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGlobal() {
+            setTimeout(() => {
+                const ctx = document.getElementById('globalChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['DPDPA/GDPR Awareness', 'Trust in Organizations', 'Cookie Rejection Rate'],
+                            datasets: [
+                                { label: 'India', data: [16, 32, 45], backgroundColor: '#f97316' },
+                                { label: 'EU (GDPR)', data: [60, 54, 68], backgroundColor: '#3b82f6' },
+                                { label: 'US (CCPA)', data: [45, 48, 52], backgroundColor: '#8b5cf6' }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#fff' } },
+                                tooltip: { backgroundColor: '#1f2937' }
+                            },
+                            scales: {
+                                x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                                y: { beginAtZero: true, max: 100, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">India vs. Global Privacy Metrics</h2>
+                        <p class="text-xl text-center text-gray-300 mb-12">How India compares to EU and US</p>
+
+                        <div class="bg-white/5 p-8 rounded-2xl mb-12">
+                            <div style="height: 400px">
+                                <canvas id="globalChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6 mb-12">
+                            <div class="bg-orange-900/30 p-6 rounded-xl border border-orange-500/30">
+                                <h3 class="text-xl font-bold mb-4 text-orange-400">🇮🇳 India</h3>
+                                <div class="space-y-3">
+                                    <div><span class="font-semibold">Awareness:</span> 16%</div>
+                                    <div><span class="font-semibold">Trust:</span> 32%</div>
+                                    <div><span class="font-semibold">Action:</span> 45%</div>
+                                </div>
+                            </div>
+                            <div class="bg-blue-900/30 p-6 rounded-xl border border-blue-500/30">
+                                <h3 class="text-xl font-bold mb-4 text-blue-400">🇪🇺 EU (GDPR)</h3>
+                                <div class="space-y-3">
+                                    <div><span class="font-semibold">Awareness:</span> 60%</div>
+                                    <div><span class="font-semibold">Trust:</span> 54%</div>
+                                    <div><span class="font-semibold">Action:</span> 68%</div>
+                                </div>
+                            </div>
+                            <div class="bg-purple-900/30 p-6 rounded-xl border border-purple-500/30">
+                                <h3 class="text-xl font-bold mb-4 text-purple-400">🇺🇸 US (CCPA)</h3>
+                                <div class="space-y-3">
+                                    <div><span class="font-semibold">Awareness:</span> 45%</div>
+                                    <div><span class="font-semibold">Trust:</span> 48%</div>
+                                    <div><span class="font-semibold">Action:</span> 52%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-red-900/30 to-orange-900/30 p-8 rounded-2xl border border-red-500/30 text-center mb-12">
+                            <p class="text-2xl font-bold text-red-400 mb-4">The Gap</p>
+                            <p class="text-lg text-gray-300">India lags significantly in privacy regulation awareness despite having a large, rapidly digitizing population</p>
+                        </div>
+
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigate('themes')" class="bg-gray-700 px-6 py-3 rounded-lg hover:bg-gray-600 cursor-pointer">← Back</button>
+                            <button onclick="navigate('hero')" class="bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 rounded-lg font-semibold cursor-pointer">Back to Start</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            let html = '';
+            
+            switch(currentView) {
+                case 'hero': html = renderHero(); break;
+                case 'paradox': html = renderParadox(); break;
+                case 'dpdpa': html = renderDPDPA(); break;
+                case 'banners': html = renderBanners(); break;
+                case 'themes': html = renderThemes(); break;
+                case 'global': html = renderGlobal(); break;
+            }
+            
+            app.innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
